@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Haskell CI
 
 # Controls when the workflow will run
 on:
@@ -15,6 +15,24 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  build_and_test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Haskell GHC
+        uses: haskell/actions/setup@v1
+        with:
+          ghc-version: 'latest'  # Use the latest GHC version
+          stack-version: 'latest'  # Use the latest Cabal version
+      - name: Build with Stack
+        run: stack build
+      - name: Test with Stack
+        run: stack test
+
+
   push_to_mirror:
     runs-on: ubuntu-latest
     steps:
