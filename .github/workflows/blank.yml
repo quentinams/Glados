@@ -16,7 +16,6 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   push_to_mirror:
-    needs : check_program_compilation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,4 +26,4 @@ jobs:
           target_repo_url:
             git@github.com:EpitechPromo2026/B-FUN-500-MPL-5-1-glados-quentin.aumas.git
           ssh_private_key:
-            ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
+            ${{ secrets.GITLAB_SSH_PRIVATE_KEY }} 
