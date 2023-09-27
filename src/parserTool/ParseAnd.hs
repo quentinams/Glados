@@ -1,7 +1,6 @@
 module ParseAnd (parseAnd, parseAndWith, parseMany, parseSome) where
 import Types
 
-
 parseAnd :: Parser a -> Parser b -> Parser (a, b)
 parseAnd p1 p2 input =
     case p1 input of

@@ -1,15 +1,12 @@
 module ParseOr (parseOr, parseAnyCharUsingOr) where
 import ParseChar
-
 import Types
-
 
 parseOr :: Parser a -> Parser a -> Parser a
 parseOr p1 p2 input =
     case p1 input of
         Nothing -> p2 input
         success -> success
-
 
 parseAnyCharUsingOr :: String -> Parser Char
 parseAnyCharUsingOr chars input = 

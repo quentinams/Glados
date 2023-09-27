@@ -10,5 +10,3 @@ parseUInt = parseAndWith (\digits _ -> foldl (\acc d -> acc * 10 + digitToInt d)
 
 parseInt :: Parser Int
 parseInt = parseOr (parseAndWith (\sign num -> if sign == '-' then -num else num) (parseAnyChar "+-") parseUInt) parseUInt
-
-
