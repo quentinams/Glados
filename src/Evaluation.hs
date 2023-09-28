@@ -2,82 +2,117 @@ module Evaluation (evalExpr) where
 
 import Env
 import Datas
+import Debug.Trace
 
-eval :: Env -> Expr -> Expr
-eval env (Symbol s) = 
+getName :: Expr -> Either String String
+getName (Symbol s) = Right s
+getName _ = Left "Expected a symbol"
+
+eval :: Env -> Expr -> Either String (Env, Expr)
+eval env (List ((Symbol "lambda"):List params:body:[])) = 
+    let strParams = map (\(Symbol s) -> s) params in
+    Right (env, Lambda strParams body)
+eval env (List (f:args)) = 
+    case eval env f of
+        Right (_, Lambda params body) -> 
+            let argVals = map (\arg -> case eval env arg of 
+                                            Right (_, val) -> val
+                                            Left err -> Symbol ("Error: " ++ err)) args
+                newEnv = zip params argVals ++ env
+            in eval newEnv body
+        Right (_, f') -> apply env f' args
+        Left err -> Left err
+eval env expr = 
+    case expr of
+        Symbol s -> 
+            case lookupEnv s env of
+                Just expr' -> Right (env, expr')
+                Nothing    -> Left $ "Variable not found: " ++ s 
+        Number n -> Right (env, Number n)
+        List(x:xs) -> apply env x xs
+
+evalFloat :: Env -> Expr -> Either String Float
+evalFloat env (Symbol s) = 
     case lookupEnv s env of
-        Just expr -> expr
-        Nothing   -> error $ "Variable not found: " ++ s 
-eval _ (Number n) = Number n
-eval env (List(x:xs)) = apply env x xs
+        Just (Number n) -> Right n
+        _               -> Left $ "Expected number for symbol: " ++ s
+evalFloat env (Number n) = Right n
+evalFloat _ _ = Left "Expected number"
 
-evalFloat :: Env -> Expr -> Float
-evalFloat env expr = case eval env expr of
-    Number n -> n
-    _        -> error "Expected number"
+apply :: Env -> Expr -> [Expr] -> Either String (Env, Expr)
+apply env (Symbol s) args = 
+   case s of
+        "define" -> defineVar env args
+        "+" -> addArgs env args
+        "div" -> divideArgs env args
+        "mod" -> moduloArgs env args
+        _   -> Left $ "Unknown function: " ++ s
+apply _ _ _ = Left "Expected symbol at head of list"
 
-apply :: Env -> Expr -> [Expr] -> Expr
-apply env (Symbol s) args = case s of
-    "+" -> addArgs env args
-    "-" -> subtractArgs env args
-    "*" -> multiplyArgs env args
-    "div" -> divideArgs env args
-    "mod" -> moduloArgs env args
-    "eq?" ->
-        if length args == 2
-           then if equalExpr env (head args) (args !! 1) 
-                   then Symbol "true" 
-                   else Symbol "false"
-           else error "'eq?' expects exactly two arguments"
-    "<" ->
-        if length args == 2 && compareExprs env (head args) (args !! 1) == Just LT
-           then Symbol "true"
-           else Symbol "false"
-    ">" ->
-        if length args == 2 && compareExprs env (head args) (args !! 1) == Just GT
-           then Symbol "true"
-           else Symbol "false"
-    _   -> error $ "Unknown function: " ++ s
-apply _ _ _ = error "Expected symbol at head of list"
+defineVar :: Env -> [Expr] -> Either String (Env, Expr)
+defineVar env [Symbol var, expr] = 
+    do
+        (newEnv, val) <- eval env expr
+        Right (extendEnv newEnv [(var, val)], val)
+defineVar _ _ = Left "define expects a symbol and an expression"
 
-addArgs :: Env -> [Expr] -> Expr
-addArgs env args = Number $ foldl1 (+) (map (evalFloat env) args)
+addArgs :: Env -> [Expr] -> Either String (Env, Expr)
+addArgs env args = 
+    do
+        nums <- mapM (evalFloat env) args
+        return (env, Number $ foldl (+) 0 nums)
 
-subtractArgs :: Env -> [Expr] -> Expr
-subtractArgs env args = Number $ foldl1 (-) (map (evalFloat env) args)
+subtractArgs :: Env -> [Expr] -> Either String (Env, Expr)
+subtractArgs env args = 
+    do
+        nums <- mapM (evalFloat env) args
+        Right (env, Number $ foldl1 (-) nums)
 
-multiplyArgs :: Env -> [Expr] -> Expr
-multiplyArgs env args = Number $ foldl1 (*) (map (evalFloat env) args)
+multiplyArgs :: Env -> [Expr] -> Either String (Env, Expr)
+multiplyArgs env args = 
+    do
+        nums <- mapM (evalFloat env) args
+        Right (env, Number $ foldl1 (*) nums)
 
-divideArgs :: Env -> [Expr] -> Expr
-divideArgs env args = Number $ foldl1 (/) (map (evalFloat env) args)
+divideArgs :: Env -> [Expr] -> Either String (Env, Expr)
+divideArgs env args = 
+    do
+        nums <- mapM (evalFloat env) args
+        if any (== 0) nums
+            then Left "Division by zero"
+            else Right (env, Number $ foldl1 (/) nums)
 
-moduloArgs :: Env -> [Expr] -> Expr
+moduloArgs :: Env -> [Expr] -> Either String (Env, Expr)
 moduloArgs env args 
-    | length args /= 2 = error "'mod' expects exactly two arguments"
+    | length args /= 2 = Left "'mod' expects exactly two arguments"
     | otherwise = 
-        let 
-            n1 = round $ evalFloat env (head args)
-            n2 = round $ evalFloat env (args !! 1)
-        in 
+        do
+            n1 <- round <$> evalFloat env (head args)
+            n2 <- round <$> evalFloat env (args !! 1)
             if n2 == 0 
-            then error "Division by zero in 'mod'"
-            else Number (fromIntegral $ n1 `mod` n2)
+            then Left "Division by zero in 'mod'"
+            else Right (env, Number (fromIntegral $ n1 `mod` n2))
 
-equalExpr :: Env -> Expr -> Expr -> Bool
-equalExpr env (Number n1) (Number n2) = n1 == n2
-equalExpr env (Symbol s1) (Symbol s2) = s1 == s2
-equalExpr env (List l1) (List l2) = all (uncurry (equalExpr env)) (zip l1 l2)
-equalExpr _ _ _ = False
+equalExpr :: Env -> Expr -> Expr -> Either String Bool
+equalExpr env (Number n1) (Number n2) = Right (n1 == n2)
+equalExpr env (Symbol s1) (Symbol s2) = Right (s1 == s2)
+equalExpr env (List l1) (List l2) = 
+    if length l1 == length l2
+    then fmap and (sequence (zipWith (equalExpr env) l1 l2))
+    else Left "Lists do not have the same length"
+equalExpr _ _ _ = Left "Mismatched types"
 
-compareExprs :: Env -> Expr -> Expr -> Maybe Ordering
-compareExprs env (Number n1) (Number n2) = Just $ compare n1 n2
-compareExprs env (Symbol s1) (Symbol s2) = Just $ compare s1 s2
-compareExprs env (List l1) (List l2) = foldl combine (Just EQ) (zipWith (compareExprs env) l1 l2)
+compareExprs :: Env -> Expr -> Expr -> Either String (Maybe Ordering)
+compareExprs env (Number n1) (Number n2) = Right $ Just $ compare n1 n2
+compareExprs env (Symbol s1) (Symbol s2) = Right $ Just $ compare s1 s2
+compareExprs env (List l1) (List l2) = 
+    if length l1 == length l2
+    then fmap (foldl combine (Just EQ)) (sequence (zipWith (compareExprs env) l1 l2))
+    else Left "Lists do not have the same length"
   where
     combine (Just EQ) o = o
     combine _ _ = Nothing
-compareExprs _ _ _ = Nothing
+compareExprs _ _ _ = Left "Mismatched types"
 
-evalExpr :: Expr -> Expr
-evalExpr = eval initialEnv
+evalExpr :: Env -> Expr -> Either String (Env, Expr)
+evalExpr = eval
