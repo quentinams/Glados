@@ -4,7 +4,7 @@ import Datas
 type Env = [(String, Expr)]
 
 initialEnv :: Env
-initialEnv = [("+", Symbol "+"), ("-", Symbol "-"), ("*", Symbol "*")]
+initialEnv = [("+", Symbol "+"), ("-", Symbol "-"), ("*", Symbol "*"), ("/", Symbol "/")]
 
 lookupEnv :: String -> Env -> Maybe Expr
 lookupEnv _ [] = Nothing

@@ -1,3 +1,3 @@
 module Datas (Expr(..)) where
 
-data Expr = Symbol String | Number Int | List [Expr] deriving (Show)
+data Expr = Symbol String | Number Float | List [Expr] deriving (Show)
