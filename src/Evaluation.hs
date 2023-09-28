@@ -21,7 +21,8 @@ apply env (Symbol s) args = case s of
     "+" -> addArgs env args
     "-" -> subtractArgs env args
     "*" -> multiplyArgs env args
-    "/" -> divideArgs env args
+    "div" -> divideArgs env args
+    "mod" -> moduloArgs env args
     "eq?" ->
         if length args == 2
            then if equalExpr env (head args) (args !! 1) 
@@ -50,6 +51,18 @@ multiplyArgs env args = Number $ foldl1 (*) (map (evalFloat env) args)
 
 divideArgs :: Env -> [Expr] -> Expr
 divideArgs env args = Number $ foldl1 (/) (map (evalFloat env) args)
+
+moduloArgs :: Env -> [Expr] -> Expr
+moduloArgs env args 
+    | length args /= 2 = error "'mod' expects exactly two arguments"
+    | otherwise = 
+        let 
+            n1 = round $ evalFloat env (head args)
+            n2 = round $ evalFloat env (args !! 1)
+        in 
+            if n2 == 0 
+            then error "Division by zero in 'mod'"
+            else Number (fromIntegral $ n1 `mod` n2)
 
 equalExpr :: Env -> Expr -> Expr -> Bool
 equalExpr env (Number n1) (Number n2) = n1 == n2
