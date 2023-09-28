@@ -1,3 +1,3 @@
-module Datas (Expr) where
+module Datas (Expr(..)) where
 
-data Expr = Symbol String | Number Int | List [Expr]
+data Expr = Symbol String | Number Int | List [Expr] deriving (Show)

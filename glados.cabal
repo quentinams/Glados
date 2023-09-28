@@ -26,6 +26,8 @@ source-repository head
 library
   exposed-modules:
       Datas
+      Env
+      Evaluation
       Lib
       ParseAnd
       ParseChar
