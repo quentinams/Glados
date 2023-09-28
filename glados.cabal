@@ -25,7 +25,13 @@ source-repository head
 
 library
   exposed-modules:
+      Datas
       Lib
+      ParseAnd
+      ParseChar
+      ParseInt
+      ParseOr
+      Types
   other-modules:
       Paths_glados
   hs-source-dirs:
