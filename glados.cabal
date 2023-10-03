@@ -29,6 +29,7 @@ library
       Env
       Evaluation
       Lib
+      MathFunctions
       ParseAnd
       ParseChar
       ParseInt

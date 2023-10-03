@@ -1,8 +1,10 @@
 module Evaluation (evalExpr) where
 
+import Control.Monad (liftM2)
 import Env
 import Datas
 import Debug.Trace
+import MathFunctions
 
 getName :: Expr -> Either String String
 getName (Symbol s) = Right s
@@ -31,14 +33,6 @@ eval env expr =
         Number n -> Right (env, Number n)
         List(x:xs) -> apply env x xs
 
-evalFloat :: Env -> Expr -> Either String Float
-evalFloat env (Symbol s) = 
-    case lookupEnv s env of
-        Just (Number n) -> Right n
-        _               -> Left $ "Expected number for symbol: " ++ s
-evalFloat env (Number n) = Right n
-evalFloat _ _ = Left "Expected number"
-
 apply :: Env -> Expr -> [Expr] -> Either String (Env, Expr)
 apply env (Symbol s) args = 
    case s of
@@ -51,47 +45,12 @@ apply _ _ _ = Left "Expected symbol at head of list"
 
 defineVar :: Env -> [Expr] -> Either String (Env, Expr)
 defineVar env [Symbol var, expr] = 
-    do
-        (newEnv, val) <- eval env expr
-        Right (extendEnv newEnv [(var, val)], val)
+    eval env expr >>= \(newEnv, val) -> Right (extendEnv newEnv [(var, val)], val)
 defineVar _ _ = Left "define expects a symbol and an expression"
 
 addArgs :: Env -> [Expr] -> Either String (Env, Expr)
 addArgs env args = 
-    do
-        nums <- mapM (evalFloat env) args
-        return (env, Number $ foldl (+) 0 nums)
-
-subtractArgs :: Env -> [Expr] -> Either String (Env, Expr)
-subtractArgs env args = 
-    do
-        nums <- mapM (evalFloat env) args
-        Right (env, Number $ foldl1 (-) nums)
-
-multiplyArgs :: Env -> [Expr] -> Either String (Env, Expr)
-multiplyArgs env args = 
-    do
-        nums <- mapM (evalFloat env) args
-        Right (env, Number $ foldl1 (*) nums)
-
-divideArgs :: Env -> [Expr] -> Either String (Env, Expr)
-divideArgs env args = 
-    do
-        nums <- mapM (evalFloat env) args
-        if any (== 0) nums
-            then Left "Division by zero"
-            else Right (env, Number $ foldl1 (/) nums)
-
-moduloArgs :: Env -> [Expr] -> Either String (Env, Expr)
-moduloArgs env args 
-    | length args /= 2 = Left "'mod' expects exactly two arguments"
-    | otherwise = 
-        do
-            n1 <- round <$> evalFloat env (head args)
-            n2 <- round <$> evalFloat env (args !! 1)
-            if n2 == 0 
-            then Left "Division by zero in 'mod'"
-            else Right (env, Number (fromIntegral $ n1 `mod` n2))
+    fmap (\nums -> (env, Number $ foldl (+) 0 nums)) (mapM (evalFloat env) args)
 
 equalExpr :: Env -> Expr -> Expr -> Either String Bool
 equalExpr env (Number n1) (Number n2) = Right (n1 == n2)
