@@ -14,7 +14,8 @@ initialEnv = [("+", Symbol "+"),
               (">", Symbol ">"),
               ("<", Symbol "<"),
               ("eq?", Symbol "eq?"),
-              ("define", Symbol "define")]
+              ("define", Symbol "define"),
+              ("if", Symbol "if")]
               
 
 lookupEnv :: String -> Env -> Maybe Expr

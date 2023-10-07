@@ -43,8 +43,17 @@ apply env (Symbol s) args =
         "mod" -> moduloArgs env args
         "eq?" -> equalExpr env args
         "<" -> lessThanExpr env args
+        "if" -> ifExpr env args
         _   -> Left $ "Unknown function: " ++ s
 apply _ _ _ = Left "Expected symbol at head of list"
+
+ifExpr :: Env -> [Expr] -> Either String (Env, Expr)
+ifExpr env [test, consequent, alternative] = 
+    do (env1, testVal) <- eval env test
+       case testVal of
+           Bool b -> if b then eval env1 consequent else eval env1 alternative
+           _      -> Left "if: test expression did not evaluate to a boolean"
+ifExpr _ _ = Left "if: expects exactly three arguments"
 
 equalExpr :: Env -> [Expr] -> Either String (Env, Expr)
 equalExpr env [expr1, expr2] = 
