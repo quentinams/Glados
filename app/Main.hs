@@ -7,21 +7,7 @@ import Control.Monad (foldM)
 main :: IO ()
 main = do
     let expressions = 
-            [ List [Symbol "define", Symbol "factorial", 
-                    List [Symbol "lambda", List [Symbol "n"], 
-                          List [Symbol "if", 
-                                List [Symbol "eq?", Symbol "n", Number 1],
-                                Number 1,
-                                List [Symbol "*", Symbol "n", 
-                                      List [Symbol "factorial", 
-                                            List [Symbol "-", Symbol "n", Number 1]
-                                      ]
-                                ]
-                          ]
-                    ]
-            ]
-            , List [Symbol "factorial", Number 5]
-            ]
+            [ List [Symbol "define", Symbol "x", Number 5], List [Symbol "+", Symbol "x", Number 10]]
 
     (finalEnv, maybeLastResult) <- foldM evalAndStore (initialEnv, Nothing) expressions
     case maybeLastResult of
