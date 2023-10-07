@@ -40,8 +40,16 @@ apply env (Symbol s) args =
         "+" -> addArgs env args
         "div" -> divideArgs env args
         "mod" -> moduloArgs env args
+        "eq?" -> equalExpr env args
         _   -> Left $ "Unknown function: " ++ s
 apply _ _ _ = Left "Expected symbol at head of list"
+
+equalExpr :: Env -> [Expr] -> Either String (Env, Expr)
+equalExpr env [expr1, expr2] = 
+    do (env1, val1) <- eval env expr1
+       (env2, val2) <- eval env1 expr2
+       return (env2, Bool $ val1 == val2)
+equalExpr _ _ = Left "eq? expects exactly two arguments"
 
 defineVar :: Env -> [Expr] -> Either String (Env, Expr)
 defineVar env [Symbol var, expr] = 
@@ -51,27 +59,6 @@ defineVar _ _ = Left "define expects a symbol and an expression"
 addArgs :: Env -> [Expr] -> Either String (Env, Expr)
 addArgs env args = 
     fmap (\nums -> (env, Number $ foldl (+) 0 nums)) (mapM (evalFloat env) args)
-
-equalExpr :: Env -> Expr -> Expr -> Either String Bool
-equalExpr env (Number n1) (Number n2) = Right (n1 == n2)
-equalExpr env (Symbol s1) (Symbol s2) = Right (s1 == s2)
-equalExpr env (List l1) (List l2) = 
-    if length l1 == length l2
-    then fmap and (sequence (zipWith (equalExpr env) l1 l2))
-    else Left "Lists do not have the same length"
-equalExpr _ _ _ = Left "Mismatched types"
-
-compareExprs :: Env -> Expr -> Expr -> Either String (Maybe Ordering)
-compareExprs env (Number n1) (Number n2) = Right $ Just $ compare n1 n2
-compareExprs env (Symbol s1) (Symbol s2) = Right $ Just $ compare s1 s2
-compareExprs env (List l1) (List l2) = 
-    if length l1 == length l2
-    then fmap (foldl combine (Just EQ)) (sequence (zipWith (compareExprs env) l1 l2))
-    else Left "Lists do not have the same length"
-  where
-    combine (Just EQ) o = o
-    combine _ _ = Nothing
-compareExprs _ _ _ = Left "Mismatched types"
 
 evalExpr :: Env -> Expr -> Either String (Env, Expr)
 evalExpr = eval
