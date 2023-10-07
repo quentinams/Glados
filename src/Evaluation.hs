@@ -41,6 +41,7 @@ apply env (Symbol s) args =
         "div" -> divideArgs env args
         "mod" -> moduloArgs env args
         "eq?" -> equalExpr env args
+        "<" -> lessThanExpr env args
         _   -> Left $ "Unknown function: " ++ s
 apply _ _ _ = Left "Expected symbol at head of list"
 
@@ -50,6 +51,15 @@ equalExpr env [expr1, expr2] =
        (env2, val2) <- eval env1 expr2
        return (env2, Bool $ val1 == val2)
 equalExpr _ _ = Left "eq? expects exactly two arguments"
+
+lessThanExpr :: Env -> [Expr] -> Either String (Env, Expr)
+lessThanExpr env [expr1, expr2] = 
+    do (env1, val1) <- eval env expr1
+       (env2, val2) <- eval env1 expr2
+       case (val1, val2) of
+         (Number n1, Number n2) -> return (env2, Bool $ n1 < n2)
+         _                      -> Left "lessThan: expects two numbers"
+lessThanExpr _ _ = Left "lessThan: expects exactly two arguments"
 
 defineVar :: Env -> [Expr] -> Either String (Env, Expr)
 defineVar env [Symbol var, expr] = 
