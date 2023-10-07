@@ -39,6 +39,7 @@ apply env (Symbol s) args =
         "define" -> defineVar env args
         "+" -> addArgs env args
         "*" -> multiplyArgs env args
+        "-" -> subtractArgs env args
         "div" -> divideArgs env args
         "mod" -> moduloArgs env args
         "eq?" -> equalExpr env args
