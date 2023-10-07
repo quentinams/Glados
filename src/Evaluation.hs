@@ -38,6 +38,7 @@ apply env (Symbol s) args =
    case s of
         "define" -> defineVar env args
         "+" -> addArgs env args
+        "*" -> multiplyArgs env args
         "div" -> divideArgs env args
         "mod" -> moduloArgs env args
         "eq?" -> equalExpr env args
