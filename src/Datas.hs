@@ -7,5 +7,5 @@ instance Show Expr where
     show (Number n) = show n
     show (Bool b) = show b
     show (List l) = show l
-    show (Lambda params body) = "Lambda " ++ show params ++ " " ++ show body
-    show (Func params body) = "Func " ++ show params
+    show (Lambda params body) = "#<procedure>"
+    show (Func params body) = "#<procedure>"
