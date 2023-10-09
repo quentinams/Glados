@@ -8,16 +8,6 @@ import Control.Applicative (Alternative(..))
 -- import Control.Applicative ((<*>))
 import Control.Monad (void)
 
--- data Expr = Symbol String | Number Float | Bool Bool | List [Expr] | Lambda [String] Expr | Func [String] Expr deriving (Eq)
-
--- instance Show Expr where
---     show (Symbol s) = show s
---     show (Number n) = if fromIntegral (floor n) == n then show (floor n) else show n
---     show (Bool b) = if b then "#t" else "#f"
---     show (List l) = show l
---     show (Lambda params body) = "#<procedure>"
---     show (Func params body) = "#<procedure>"
-
 data Parser a = Parser {
     runParser :: String -> Maybe (a, String)
 }
@@ -103,17 +93,10 @@ parseSome :: Parser a -> Parser [a]
 parseSome p =
     parseAndWith (\x xs -> x:xs) p (parseMany p)
 
-
--- parseManyCount :: Parser a -> Parser Int
--- parseManyCount p = length <$> parseMany p -- <$> est un alias de fmap 1- analyse lance parsemany 2- lance length sur le resultat de parsemany
-
--- parseSomeCount :: Parser a -> Parser Int
--- parseSomeCount p = length <$> parseSome p
-
 parseSymbol :: Parser Expr
 parseSymbol = do
     skipSpaces
-    Symbol <$> parseSome (parseAnyChar (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9' ] ++ "-_"))
+    Symbol <$> parseSome (parseAnyChar (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9' ] ++ "-_+*"))
 
 parseNumber :: Parser Expr
 parseNumber = do
@@ -185,6 +168,13 @@ parseString = traverse (parseAnyChar . pure)
 skipSpaces :: Parser ()
 skipSpaces = void $ parseMany (parseAnyChar " \t\n\r")
 
+parseExprs :: Parser [Expr]
+parseExprs = do
+    skipSpaces
+    e <- parseExpr
+    skipSpaces
+    es <- (parseExprs <|> pure [])
+    return (e:es)
 
 
 main :: IO ()
@@ -193,18 +183,23 @@ main = do
   where
     loop = do
         putStrLn "Enter your lisp expression (or type 'quit' to exit):"
-        input <- getLine -- Obtenir une entrée de l'utilisateur
+        input <- getLine
         if input == "quit"
             then putStrLn "Goodbye!"
             else do
                 case runParser parseExpr input of
                     Just (expr, _) -> do
-                        (finalEnv, maybeLastResult) <- evalAndStore (initialEnv, Nothing) expr
-                        case maybeLastResult of
+                        -- Print the parsed expression for debugging
+                        -- putStrLn $ "Parsed expression: " ++ show expr
+                        result <- evalAndStore (initialEnv, Nothing) expr
+                        case snd result of
                             Just lastResult -> putStrLn $ show lastResult
                             Nothing -> putStrLn "No result to show."
                     Nothing -> putStrLn "Failed to parse the lisp expression."
                 loop
+
+
+
 
 
 
