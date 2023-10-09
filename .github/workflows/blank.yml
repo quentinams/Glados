@@ -35,9 +35,39 @@ jobs:
       - name: Test with Stack
         run: stack test
 
+  build_and_compress:
+    name: Build and Compress
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Setup Haskell GHC
+        uses: haskell/actions/setup@v1
+        with:
+          ghc-version: 'latest'
+          stack-version: 'latest'
+          
+      - name: Build with Make
+        run: make
+
+      - name: Compress Binary and Documentation
+        run: |
+          tar -czvf gladdos.tar.gz gladdos docs/
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: gladdos-package
+          path: gladdos.tar.gz
+  
+
+
   push_to_mirror:
     runs-on: ubuntu-latest
-    needs: build_and_test
+    needs: build_and_compress
     steps:
       - uses: actions/checkout@v2
         with:
