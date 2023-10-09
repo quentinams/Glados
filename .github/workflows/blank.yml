@@ -55,7 +55,7 @@ jobs:
 
       - name: Compress Binary and Documentation
         run: |
-          tar -czvf gladdos.tar.gz gladdos docs/
+          tar -czvf gladdos.tar.gz gladdos
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
