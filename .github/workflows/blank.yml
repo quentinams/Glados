@@ -76,3 +76,38 @@ jobs:
         with:
           target_repo_url: git@github.com:EpitechPromo2026/B-FUN-500-MPL-5-1-glados-quentin.aumas.git
           ssh_private_key: ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
+
+
+  release:
+    needs: build_and_compress
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: gladdos-package
+        path: release
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: Description of the release
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: release/gladdos.tar.gz
+        asset_name: gladdos.tar.gz
+        asset_content_type: application/gzip
