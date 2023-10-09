@@ -80,7 +80,6 @@ jobs:
 
   release:
     needs: build_and_compress
-    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
 
     steps:
@@ -96,9 +95,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: Description of the release
+        tag_name: build-${{ github.run_id }}
+        release_name: Release build-${{ github.run_id }}
+        body: Description of the release build-${{ github.run_id }}
         draft: false
         prerelease: false
 
