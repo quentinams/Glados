@@ -31,7 +31,9 @@ eval env expr =
                 Just expr' -> Right (env, expr')
                 Nothing    -> Left $ "Variable not found: " ++ s 
         Number n -> Right (env, Number n)
+        Bool b -> Right (env, Bool b)  -- Ajout d'une branche pour gérer Bool
         List(x:xs) -> apply env x xs
+        _ -> Left "Unsupported expression type"  -- Branche par défaut pour tous les autres cas
 
 apply :: Env -> Expr -> [Expr] -> Either String (Env, Expr)
 apply env (Symbol s) args = 
