@@ -48,10 +48,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-
       - name: Build with Make
         run: make
 
