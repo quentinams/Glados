@@ -42,13 +42,15 @@ apply env (Symbol s) args =
         "+" -> addArgs env args
         "*" -> multiplyArgs env args
         "-" -> subtractArgs env args
-        "div" -> divideArgs env args
+        "div" -> euclideanDivision env args  -- Utilisez euclideanDivision ici
+        "/" -> floatDivision env args  -- Utilisez floatDivision ici
         "mod" -> moduloArgs env args
         "eq?" -> equalExpr env args
         "<" -> lessThanExpr env args
         "if" -> ifExpr env args
         _   -> Left $ "Unknown function: " ++ s
 apply _ _ _ = Left "Expected symbol at head of list"
+
 
 ifExpr :: Env -> [Expr] -> Either String (Env, Expr)
 ifExpr env [test, consequent, alternative] = 

@@ -1,6 +1,13 @@
 module Datas (Expr(..)) where
 
-data Expr = Symbol String | Number Float | Bool Bool | List [Expr] | Lambda [String] Expr | Func [String] Expr deriving (Eq)
+data Expr = Symbol String 
+          | Number Float 
+          | Bool Bool 
+          | List [Expr] 
+          | Lambda [String] Expr 
+          | Func [String] Expr
+          | Div Expr Expr
+          deriving (Eq)
 
 instance Show Expr where
     show (Symbol s) = show s

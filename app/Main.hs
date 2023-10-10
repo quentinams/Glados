@@ -96,7 +96,7 @@ parseSome p =
 parseSymbol :: Parser Expr
 parseSymbol = do
     skipSpaces
-    Symbol <$> parseSome (parseAnyChar (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9' ] ++ "-_+*"))
+    Symbol <$> parseSome (parseAnyChar (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9' ] ++ "-_+*/"))
 
 parseNumber :: Parser Expr
 parseNumber = do
@@ -178,10 +178,9 @@ parseExprs = do
 
 
 main :: IO ()
-main = do
-    loop
+main = loop initialEnv
   where
-    loop = do
+    loop env = do
         putStrLn "Enter your lisp expression (or type 'quit' to exit):"
         input <- getLine
         if input == "quit"
@@ -189,17 +188,12 @@ main = do
             else do
                 case runParser parseExpr input of
                     Just (expr, _) -> do
-                        -- Print the parsed expression for debugging
-                        -- putStrLn $ "Parsed expression: " ++ show expr
-                        result <- evalAndStore (initialEnv, Nothing) expr
-                        case snd result of
+                        (newEnv, maybeResult) <- evalAndStore (env, Nothing) expr
+                        case maybeResult of
                             Just lastResult -> putStrLn $ show lastResult
                             Nothing -> putStrLn "No result to show."
+                        loop newEnv
                     Nothing -> putStrLn "Failed to parse the lisp expression."
-                loop
-
-
-
 
 
 
@@ -214,7 +208,7 @@ evalAndStore (env, _) expr = do
             case val of
                 Left err -> do 
                     putStrLn $ "Evaluation error: " ++ err
-                    return (env, Nothing)
+                    return (env, Nothing)  -- Ici, nous renvoyons toujours l'ancien env
                 Right (newEnv, res) -> do
-                    return (newEnv, Just res)
+                    return (newEnv, Just res)  -- Utilisez newEnv ici
 
