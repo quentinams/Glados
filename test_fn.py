@@ -44,8 +44,19 @@ def test_lisp_interpreter(test_number, input_code, expected_output):
 
 # Test data
 tests = [
+    ("(+ 1)", "1"),
+    ("(- 1)", "-1"),
+    ("(* 1)", "1"),
+    ("(/ 1)", "1"),
     ("(+ 2 3)", "5"),
     ("(- 5 2)", "3"),
+    ("(/ 10 2)", "5"),
+    ("(div 10 3)", "3"),
+    ("(/ 10 4)", "2.5"),
+    ("(define zero (mod 10 2))", "0"),
+    ("(+ zero 1)", "1"),
+    ("(define x (+ 1 1 1 1 1 1 1 1 1 1 zero))", "10"),
+    
     # Plus de tests ici si besoin
 ]
 
