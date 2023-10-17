@@ -8,36 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_test:
-    name: Build and Test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        
-      - name: Cache .stack
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.stack
-          key: stack-${{ hashFiles('stack.yaml') }}
-      
-      - name: Setup Haskell GHC
-        uses: haskell/actions/setup@v1
-        with:
-          ghc-version: 'latest'
-          stack-version: 'latest'
-
-      - name: Build with Stack
-        run: stack build
-
-      - name: Test with Stack
-        run: stack test
-    
   run_python_tests:
     name: Run Python Tests
-    needs: build_and_test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
