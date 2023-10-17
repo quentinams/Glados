@@ -8,22 +8,28 @@ import MathFunctions
 
 getName :: Expr -> Either String String
 getName (Symbol s) = Right s
-getName _ = Left "Expected a symbol"
+getName _ = Left "Expected a symbol but got something else"
 
 eval :: Env -> Expr -> Either String (Env, Expr)
-eval env (List ((Symbol "lambda"):List params:body:[])) = 
-    let strParams = map (\(Symbol s) -> s) params in
-    Right (env, Lambda strParams body)
-eval env (List (f:args)) = 
-    case eval env f of
-        Right (_, Lambda params body) -> 
-            let argVals = map (\arg -> case eval env arg of 
-                                            Right (_, val) -> val
-                                            Left err -> Symbol ("Error: " ++ err)) args
-                newEnv = zip params argVals ++ env
-            in eval newEnv body
-        Right (_, f') -> apply env f' args
+eval env (List (Symbol "lambda" : List params : [body])) = 
+    let strParams = map getName params 
+    in case sequence strParams of
+        Right names -> Right (env, Lambda names body)
         Left err -> Left err
+eval env (List (f:args)) = do
+    (env', func) <- eval env f
+    case func of
+        Lambda params body -> 
+            if length params /= length args 
+            then Left "Lambda: Number of arguments does not match"
+            else do
+                argVals <- mapM (eval env') args
+                let newBindings = zip params (map snd argVals)
+                let newEnv = extendEnv env' newBindings
+                eval newEnv body
+        Symbol s -> 
+            apply env' func args
+        _ -> Left "Expected a function or symbol at head of list"
 eval env expr = 
     case expr of
         Symbol s -> 
@@ -31,12 +37,18 @@ eval env expr =
                 Just expr' -> Right (env, expr')
                 Nothing    -> Left $ "Variable not found: " ++ s 
         Number n -> Right (env, Number n)
-        Bool b -> Right (env, Bool b)  -- Ajout d'une branche pour gérer Bool
+        Bool b -> Right (env, Bool b)
         List(x:xs) -> apply env x xs
-        _ -> Left "Unsupported expression type"  -- Branche par défaut pour tous les autres cas
+        _ -> Left "Unsupported expression type"
+
 
 apply :: Env -> Expr -> [Expr] -> Either String (Env, Expr)
-apply env (Symbol s) args = 
+apply env (Symbol "lambda") [List params, body] = 
+    let strParams = map getName params 
+    in case sequence strParams of
+        Right names -> Right (env, Lambda names body)
+        Left err -> Left err
+apply env (Symbol s) args =
    case s of
         "define" -> defineVar env args
         "+" -> addArgs env args
@@ -77,9 +89,14 @@ lessThanExpr env [expr1, expr2] =
 lessThanExpr _ _ = Left "lessThan: expects exactly two arguments"
 
 defineVar :: Env -> [Expr] -> Either String (Env, Expr)
+defineVar env (List (Symbol funcName : params) : body : []) = 
+    let strParams = map (\(Symbol s) -> s) params 
+        lambdaExpr = Lambda strParams body
+    in Right (extendEnv env [(funcName, lambdaExpr)], lambdaExpr)
 defineVar env [Symbol var, expr] = 
     eval env expr >>= \(newEnv, val) -> Right (extendEnv newEnv [(var, val)], val)
-defineVar _ _ = Left "define expects a symbol and an expression"
+defineVar _ _ = Left "define expects a symbol and an expression or a function definition"
+
 
 addArgs :: Env -> [Expr] -> Either String (Env, Expr)
 addArgs env args = 

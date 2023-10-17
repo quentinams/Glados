@@ -1,13 +1,13 @@
 module ParseChar ( parseChar, parseAnyChar ) where
 
-import Types
+import ParserModule (Parser(..))
 
 parseChar :: Char -> Parser Char
-parseChar c (x:xs) | c == x = Just (c, xs)
-parseChar _ _ = Nothing
+parseChar c = Parser $ \s -> case s of
+    (x:xs) -> if x == c then Just (c, xs) else Nothing
+    [] -> Nothing
 
 parseAnyChar :: String -> Parser Char
-parseAnyChar chars (x:xs)
-    | x `elem` chars = Just (x, xs)
-    | otherwise = parseAnyChar chars xs
-parseAnyChar _ [] = Nothing
+parseAnyChar chars = Parser $ \input -> case input of
+    (x:xs) | x `elem` chars -> Just (x, xs)
+    _ -> Nothing
