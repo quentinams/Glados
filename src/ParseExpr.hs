@@ -91,6 +91,20 @@ parseLambda = do
 --     body <- parseExpr
 --     return (Define funcName params body)
 
+parseEq :: Parser Expr
+parseEq = do
+    skipSpaces
+    _ <- parseString "eq?"
+    skipSpaces
+    _ <- parseChar '('
+    arg1 <- parseExpr
+    skipSpaces
+    arg2 <- parseExpr
+    skipSpaces
+    _ <- parseChar ')'
+    return $ List [Symbol "eq?", arg1, arg2]
+
+
 parseList :: Parser Expr
 parseList = do
     skipSpaces
@@ -101,14 +115,13 @@ parseList = do
 
 -- Un parseur qui reconnaît n'importe quel type d'Expr
 parseExpr :: Parser Expr
-parseExpr = parseNumber  
-        -- <|> parseDefine
+parseExpr = parseNumber
+        <|> parseEq
         -- <|> parseNamedFunctionDefinition
         <|> parseSymbol
         <|> parseBool
         <|> parseList
         <|> parseLambda
-        -- <|> parseFunc
 
 parseExprs :: Parser [Expr]
 parseExprs = do
