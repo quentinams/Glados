@@ -33,18 +33,19 @@ library
       ParseAnd
       ParseChar
       ParseExpr
-      ParseInt
       ParseOr
       ParserModule
       ParseUtils
       Types
+      EvalByteCode
+      DataByteCode
   other-modules:
       Paths_glados
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      base >=4.7 && <5 , HUnit
   default-language: Haskell2010
 
 executable glados-exe
@@ -69,5 +70,6 @@ test-suite glados-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , glados
+    , glados  
+    , HUnit
   default-language: Haskell2010
