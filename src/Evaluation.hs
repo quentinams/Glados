@@ -43,6 +43,7 @@ eval env expr =
 
 
 apply :: Env -> Expr -> [Expr] -> Either String (Env, Expr)
+apply env (Symbol "eq?") args = equalExpr env args
 apply env (Symbol "lambda") [List params, body] = 
     let strParams = map getName params 
     in case sequence strParams of
@@ -57,7 +58,7 @@ apply env (Symbol s) args =
         "div" -> euclideanDivision env args  -- Utilisez euclideanDivision ici
         "/" -> floatDivision env args  -- Utilisez floatDivision ici
         "mod" -> moduloArgs env args
-        "eq?" -> equalExpr env args
+        -- "eq?" -> equalExpr env args
         "<" -> lessThanExpr env args
         "if" -> ifExpr env args
         _   -> Left $ "Unknown function: " ++ s
