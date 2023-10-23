@@ -94,16 +94,16 @@ parseLambda = do
 parseEq :: Parser Expr
 parseEq = do
     skipSpaces
+    _ <- parseString "("
+    _ <- skipSpaces
     _ <- parseString "eq?"
-    skipSpaces
-    _ <- parseChar '('
+    _ <- skipSpaces
     arg1 <- parseExpr
     skipSpaces
     arg2 <- parseExpr
-    skipSpaces
-    _ <- parseChar ')'
+    _ <- skipSpaces
+    _ <- parseString ")"
     return $ List [Symbol "eq?", arg1, arg2]
-
 
 parseList :: Parser Expr
 parseList = do

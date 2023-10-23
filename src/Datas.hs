@@ -6,8 +6,6 @@ data Expr = Symbol String
           | List [Expr] 
           | Lambda [String] Expr 
           | Func [String] Expr
-          | Div Expr Expr
-          | Define String [String] Expr
           deriving (Eq)
 
 instance Show Expr where
