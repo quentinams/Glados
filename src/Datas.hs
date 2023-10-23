@@ -1,4 +1,4 @@
-module Datas (Expr(..)) where
+module Datas (Expr(..), AST(..)) where
 
 data Expr = Symbol String 
           | Number Float 

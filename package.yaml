@@ -21,6 +21,7 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- containers
 
 ghc-options:
 - -Wall
@@ -57,3 +58,21 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - glados
+    - HUnit
+    when:
+    - condition: flag(ast)
+      source-dirs:
+      - test/ast
+    - condition: flag(bytecode)
+      source-dirs:
+      - test/bytecode
+
+flags:
+  ast:
+    description: Enable AST tests
+    manual: true
+    default: false
+  bytecode:
+    description: Enable Bytecode tests
+    manual: true
+    default: false

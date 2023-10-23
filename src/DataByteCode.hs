@@ -8,7 +8,7 @@ instance Show Value where
 
 data Op = Add | Sub | Mul | Div | Eq | Less deriving (Show, Eq)
 
-data Instruction = Push Value | Call Op | Ret | JumpIfFalse Int deriving (Show, Eq)
+data Instruction = Push Value | Call Op | Ret | JumpIfFalse Int | Jump Int deriving (Show, Eq)
 
 type Stack = [Value]
 

@@ -29,6 +29,9 @@ exec (JumpIfFalse n:is) (Bool False:s) =
     else
         Left "Error: Jump leads outside of instructions range"
 exec (JumpIfFalse _:is) (_:s) = exec is s
+exec (Jump n:is) s =
+    if n <= length is then
+        exec (drop n is) s
+    else
+        Left "Error: Jump leads outside of instructions range"
 exec _ _ = Left "Error: Invalid instruction"
-
-
