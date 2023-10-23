@@ -17,3 +17,14 @@ instance Show Expr where
     show (List l) = show l
     show (Lambda params body) = "#<procedure>"
     show (Func params body) = "#<procedure>"
+
+data AST = Var String
+        | Const Float
+        | TruthValue Bool
+        | If AST AST AST
+        | Sequence [AST]
+        | LambdaFunc [String] AST
+        | UserFunc [String] AST
+        | Application AST [AST] -- fonction et arguments
+        | Definition String AST -- définition de variable
+        deriving (Eq, Show)
