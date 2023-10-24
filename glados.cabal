@@ -35,6 +35,7 @@ flag bytecode
 
 library
   exposed-modules:
+      ASTConversion
       DataByteCode
       Datas
       Env

@@ -5,6 +5,7 @@ import EvalByteCode (execOp, exec)
 import DataByteCode (Value(..), Op(..), Instruction(..), Stack, Insts)
 import WriteByteCode (compile)
 import Datas (Expr(..), AST(..))
+import ASTConversion (exprToAST)
 
 
 -- Test cases for execOp
@@ -35,6 +36,7 @@ testCompileIf = TestCase (assertEqual "Should compile If correctly"
     (Right [Push (DataByteCode.Bool True), JumpIfFalse 3, Push (Num 5), Jump 1, Push (Num 4)]) 
     (compile (If (TruthValue True) (Const 5.0) (Const 4.0))))
 
+
 -- Here we test the integration of compile and exec functions
 testCompileAndExecSimple = TestCase (do
     let ast = Sequence [Const 1.0, Const 2.0, If (TruthValue True) (Const 5.0) (Const 4.0)]
@@ -60,7 +62,12 @@ tests = TestList [TestLabel "testExecOpDivByZero" testExecOpDivByZero,
                   TestLabel "testCompileConst" testCompileConst,
                   TestLabel "testCompileTruthValue" testCompileTruthValue,
                   TestLabel "testCompileIf" testCompileIf,
-                  TestLabel "testCompileAndExecSimple" testCompileAndExecSimple]
+                  TestLabel "testCompileAndExecSimple" testCompileAndExecSimple,
+                  "testSymbol" ~: Var "x" ~=? exprToAST (Symbol "x"),
+                  "testNumber" ~: Const 5.0 ~=? exprToAST (Number 5.0),
+                  "testBoolTrue" ~: TruthValue True ~=? exprToAST (Datas.Bool True),
+                  "testBoolFalse" ~: TruthValue False ~=? exprToAST (Datas.Bool False),
+                  "testLambda" ~: LambdaFunc ["x"] (Var "x") ~=? exprToAST (Lambda ["x"] (Symbol "x"))]
 
 main :: IO Counts
 main = runTestTT tests
