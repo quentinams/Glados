@@ -4,37 +4,32 @@ import Env
 import Evaluation
 import ParserModule
 import ParseExpr
+import ASTConversion
+import WriteByteCode
+import EvalByteCode
+import System.Environment
+import System.IO
+
 
 main :: IO ()
-main = loop initialEnv
-  where
-    loop env = do
-        putStrLn "Enter your lisp expression (or type 'quit' to exit):"
-        input <- getLine
-        if input == "quit"
-            then putStrLn "Goodbye!"
-            else do
-                case runParser parseExpr input of
-                    Just (expr, _) -> do
-                        (newEnv, maybeResult) <- evalAndStore (env, Nothing) expr
-                        case maybeResult of
-                            Just lastResult -> putStrLn $ show lastResult
-                            Nothing -> putStrLn "No result to show."
-                        loop newEnv
-                    Nothing -> putStrLn "Failed to parse the lisp expression."
+main = do 
+    args <- getArgs
+    case args of 
+        [filename] -> do
+            content <- readFile filename
+            processLisp content
+        _ -> putStrLn "Usage ./glados <filename>"
 
-evalAndStore :: (Env, Maybe Expr) -> Expr -> IO (Env, Maybe Expr)
-evalAndStore (env, _) expr = do
-    result <- try (evaluate (evalExpr env expr)) :: IO (Either SomeException (Either String (Env, Expr)))
-    case result of
-        Left ex -> do 
-            putStrLn $ "An error occurred: " ++ show ex
-            return (env, Nothing)
-        Right val ->
-            case val of
-                Left err -> do 
-                    putStrLn $ "Evaluation error: " ++ err
-                    return (env, Nothing)  -- Ici, nous renvoyons toujours l'ancien env
-                Right (newEnv, res) -> do
-                    return (newEnv, Just res)  -- Utilisez newEnv ici
+processLisp :: String -> IO ()
+processLisp content = 
+    case runParser parseExpr content of
+        Just (expr, _) -> do
+            let ast = exprToAST expr
+            case compile ast of
+                Left err -> putStrLn $ "Compilation error: " ++ err
+                Right bytecode -> do
+                    case exec bytecode [] of
+                        Left runtimeErr -> putStrLn $ "Runtime error: " ++ runtimeErr
+                        Right value -> putStrLn $ show value
+        Nothing -> putStrLn "Failed to parse the lisp expression."
 

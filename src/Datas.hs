@@ -23,6 +23,7 @@ data AST = Var String
         | Sequence [AST]
         | LambdaFunc [String] AST
         | UserFunc [String] AST
-        | Application AST [AST] -- fonction et arguments
-        | Definition String AST -- définition de variable
+        | Application AST [AST]
+        | Definition String AST
+        | Add AST AST
         deriving (Eq, Show)

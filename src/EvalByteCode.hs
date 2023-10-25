@@ -16,8 +16,8 @@ execOp opN (Num x:Num y:stack) =
 execOp _ _ = Left "Error: Invalid stack for operation"
 
 exec :: Insts -> Stack -> Either String Value
-exec [] _ = Left "Error: No instructions"
-exec (Ret:_) (v:_) = Right v
+exec [] (v:_) = Right v
+exec [] [] = Left "Error: Empty stack and no instructions"
 exec (Push v:is) s = exec is (v:s)
 exec (Call op:is) s = 
     case execOp op s of
@@ -35,3 +35,4 @@ exec (Jump n:is) s =
     else
         Left "Error: Jump leads outside of instructions range"
 exec _ _ = Left "Error: Invalid instruction"
+

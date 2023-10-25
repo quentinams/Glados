@@ -11,6 +11,7 @@ compile ast =
         Const n -> Right [Push (Num (round n))]  -- conversion Float vers Int, attention à la perte de précision
         TruthValue b -> Right [Push (DataByteCode.Bool b)]
         If cond thenBranch elseBranch -> compileIf cond thenBranch elseBranch
+        Datas.Add left right -> compileBinaryOp DataByteCode.Add left right
         Sequence exprs -> compileSequence exprs
         -- Les autres cas nécessitent une gestion plus complexe des environnements, etc.
         _ -> Left $ "Unsupported operation during compilation: " ++ show ast
@@ -33,5 +34,12 @@ compileSequence (x:xs) = do
     xCode <- compile x
     xsCode <- compileSequence xs
     return $ xCode ++ xsCode
+
+-- Compile une opération binaire
+compileBinaryOp :: Op -> AST -> AST -> Either String Insts
+compileBinaryOp op left right = do
+    leftCode <- compile left
+    rightCode <- compile right
+    return $ leftCode ++ rightCode ++ [Call op]
 
 -- ... Vous devrez implémenter le reste des cas en suivant une logique similaire.
