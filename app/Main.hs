@@ -15,10 +15,14 @@ main :: IO ()
 main = do 
     args <- getArgs
     case args of 
-        [filename] -> do
+        ["-i", filename] -> do
             content <- readFile filename
             processLisp content
-        _ -> putStrLn "Usage ./glados <filename>"
+        ["--asm", filename] -> do
+            putStrLn "Print en human readable la compilation"
+        [filename] -> do
+            putStrLn "Création d'un binaire"
+        _ -> putStrLn "Usage: ./glados [-i|--asm] <filename>"
 
 processLisp :: String -> IO ()
 processLisp content = 
