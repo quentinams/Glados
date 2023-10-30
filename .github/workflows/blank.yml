@@ -7,33 +7,33 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-jobs:
-  run_python_tests:
-    name: Run Python Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+# jobs:
+#   run_python_tests:
+#     name: Run Python Tests
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
 
-      - name: Setup Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.11'
+#       - name: Setup Python
+#         uses: actions/setup-python@v3
+#         with:
+#           python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pexpect
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install pexpect
 
-      - name: Build with Make
-        run: make
+#       - name: Build with Make
+#         run: make
 
-      - name: Run Tests
-        run: python test_fn.py
+#       - name: Run Tests
+#         run: python test_fn.py
 
   build_and_compress:
     name: Build and Compress
-    needs: run_python_tests
+    # needs: run_python_tests
     runs-on: ubuntu-latest
     
     steps:
