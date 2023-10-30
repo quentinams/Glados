@@ -9,6 +9,8 @@ import WriteByteCode
 import EvalByteCode
 import System.Environment
 import System.IO
+import DataByteCode (Value(..), Op(..), Instruction(..), Stack, Insts, showInstructions)
+
 
 
 main :: IO ()
@@ -19,7 +21,8 @@ main = do
             content <- readFile filename
             processLisp content
         ["--asm", filename] -> do
-            putStrLn "Print en human readable la compilation"
+            content <- readFile filename
+            processLispHumanReadable content
         [filename] -> do
             putStrLn "Création d'un binaire"
         _ -> putStrLn "Usage: ./glados [-i|--asm] <filename>"
@@ -35,5 +38,16 @@ processLisp content =
                     case exec bytecode [] of
                         Left runtimeErr -> putStrLn $ "Runtime error: " ++ runtimeErr
                         Right value -> putStrLn $ show value
+        Nothing -> putStrLn "Failed to parse the lisp expression."
+
+processLispHumanReadable :: String -> IO ()
+processLispHumanReadable content = 
+    case runParser parseExpr content of
+        Just (expr, _) -> do
+            let ast = exprToAST expr
+            case compile ast of
+                Left err -> putStrLn $ "Compilation error: " ++ err
+                Right bytecode -> do
+                    putStr $ showInstructions bytecode
         Nothing -> putStrLn "Failed to parse the lisp expression."
 

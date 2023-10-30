@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-# jobs:
+jobs:
 #   run_python_tests:
 #     name: Run Python Tests
 #     runs-on: ubuntu-latest

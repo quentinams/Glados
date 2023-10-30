@@ -1,4 +1,4 @@
-module DataByteCode (Value(..), Op(..), Instruction(..), Stack, Insts) where
+module DataByteCode (Value(..), Op(..), Instruction(..), Stack, Insts, showInstructions) where
 
 data Value = Num Int | Bool Bool deriving (Eq)
 
@@ -13,3 +13,6 @@ data Instruction = Push Value | Call Op | Ret | JumpIfFalse Int | Jump Int deriv
 type Stack = [Value]
 
 type Insts = [Instruction]
+
+showInstructions :: Insts -> String
+showInstructions insts = unlines (map show insts)
