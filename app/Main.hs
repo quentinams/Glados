@@ -15,6 +15,7 @@ import Data.Word (Word8)
 import Data.Bits (shiftR, (.&.))
 import Data.ByteString.Lazy (pack, hPut)
 import Data.Char (isDigit)
+import EvalByteCode
 
 main :: IO ()
 main = do 
@@ -28,16 +29,16 @@ main = do
             processLispHumanReadable content
         ["-c", filename] -> do
             content <- readFile filename
-            case runParser parseExpr content of 
-                Just (expr, _) -> do
-                    let ast = exprToAST expr
-                    case compile ast of
+            case parseLispFile content of 
+                Right exprs -> do
+                    let asts = map exprToAST exprs
+                    case compile (Sequence asts) of
                         Left err -> putStrLn $ "Compilation error: " ++ err
                         Right bytecode -> do
                             let bytecodeInstructions = showInstructions bytecode
                             writeFile (changeExtensionToBC filename) bytecodeInstructions
                             putStrLn "Bytecode écrit avec succès dans le fichier .bc."
-                Nothing -> putStrLn "Failed to parse the file content."
+                Left err -> putStrLn err
         [filename] 
             | hasBCExtension filename -> do
                 content <- readFile filename
@@ -45,19 +46,31 @@ main = do
             | otherwise -> putStrLn "Please provide a valid .bc file."
         _ -> putStrLn "Usage: ./glados [-i|--asm|-c] <filename>"
 
-
 processLisp :: String -> IO ()
-processLisp content = 
-    case runParser parseExpr content of
-        Just (expr, _) -> do
-            let ast = exprToAST expr
-            case compile ast of
-                Left err -> putStrLn $ "Compilation error: " ++ err
-                Right bytecode -> do
-                    case exec bytecode [] [] of
-                        Left runtimeErr -> putStrLn $ "Runtime error: " ++ runtimeErr
-                        Right value -> putStrLn $ show value
-        Nothing -> putStrLn "Failed to parse the lisp expression."
+processLisp content =
+    case parseLispFile content of
+        Right exprs -> do
+            let initialEnv = []  -- Environnement initial vide
+            let (_, finalEnv, values) = foldl
+                    (\(env, accEnv, accValues) expr ->
+                        case compile (exprToAST expr) of
+                            Left err -> (env, accEnv ++ [env], accValues ++ [Left err])
+                            Right instructions ->
+                                case exec instructions [] env of
+                                    Left runtimeErr -> (env, accEnv ++ [env], accValues ++ [Left runtimeErr])
+                                    Right result -> (env, accEnv ++ [env], accValues ++ [Right result])
+                    )
+                    (initialEnv, [], [])
+                    exprs
+            -- Afficher les résultats ou les erreurs
+            case values of
+                [] -> putStrLn "No expressions found."
+                _ -> do
+                    forM_ values $ \value ->
+                        case value of
+                            Left err -> putStrLn $ "Error: " ++ err
+                            Right result -> putStrLn $ show result
+        Left err -> putStrLn err
 
 processLispHumanReadable :: String -> IO ()
 processLispHumanReadable content = 

@@ -1,4 +1,4 @@
-module ParseExpr (parseList, parseExpr, parseExprs) where
+module ParseExpr (parseList, parseExpr, parseExprs, parseLispFile) where
 
 
 import ParserModule
@@ -6,6 +6,9 @@ import Datas
 import ParseChar
 import ParseAnd
 import ParseUtils
+import ASTConversion (exprToAST)
+import WriteByteCode (compile)
+import EvalByteCode (exec)
 
 import Control.Applicative ((<|>))
 
@@ -42,55 +45,6 @@ parseLambda = do
   _ <- parseString ")"
   return $ Lambda params body
 
-
-
--- parseFunc :: Parser Expr
--- parseFunc = do
---     skipSpaces
---     _ <- parseString "Function"
---     skipSpaces
---     _ <- parseChar '('
---     params <- parseMany (do
---         skipSpaces
---         Symbol sym <- parseSymbol
---         return sym)
---     _ <- parseChar ')'
---     skipSpaces
---     body <- parseExpr
---     return (Func params body)
-
--- parseNamedFunctionDefinition :: Parser Expr
--- parseNamedFunctionDefinition = do
---     skipSpaces
---     _ <- parseString "define"
---     skipSpaces
---     _ <- parseChar '('
---     Symbol funcName <- parseSymbol
---     skipSpaces
---     args <- parseMany (skipSpaces *> parseSymbol)
---     skipSpaces
---     _ <- parseChar ')'
---     body <- parseExpr
---     let lambdaExpr = Lambda (map (\(Symbol s) -> s) args) body
---     return $ List [Symbol "define", Symbol funcName, lambdaExpr]
-
-
--- parseDefine :: Parser Expr
--- parseDefine = do
---     skipSpaces
---     _ <- parseString "define"
---     skipSpaces
---     _ <- parseChar '('
---     Symbol funcName <- parseSymbol
---     params <- parseMany (do
---         skipSpaces
---         Symbol sym <- parseSymbol
---         return sym)
---     _ <- parseChar ')'
---     skipSpaces
---     body <- parseExpr
---     return (Define funcName params body)
-
 parseEq :: Parser Expr
 parseEq = do
     skipSpaces
@@ -123,10 +77,38 @@ parseExpr = parseNumber
         <|> parseList
         <|> parseLambda
 
+-- parseExprs :: Parser [Expr]
+-- parseExprs = do
+--     skipSpaces
+--     e <- parseExpr
+--     skipSpaces
+--     es <- (parseExprs <|> pure [])
+--     return (e:es)
+
+-- Ajoutez cette fonction pour analyser plusieurs expressions dans un fichier.
+parseLispFile :: String -> Either String [Expr]
+parseLispFile content = 
+    case runParser parseExprs content of
+        Just (exprs, _) -> Right exprs
+        Nothing -> Left "Failed to parse the Lisp file."
+
+-- Modifiez votre fonction `processLisp` pour qu'elle utilise la nouvelle fonction.
+processLisp :: String -> IO ()
+processLisp content = 
+    case parseLispFile content of
+        Right exprs -> do
+            let asts = map exprToAST exprs
+            case compile (Sequence asts) of
+                Left err -> putStrLn $ "Compilation error: " ++ err
+                Right bytecode -> do
+                    case exec bytecode [] [] of
+                        Left runtimeErr -> putStrLn $ "Runtime error: " ++ runtimeErr
+                        Right value -> putStrLn $ show value
+        Left err -> putStrLn err
+
+-- Parse file
 parseExprs :: Parser [Expr]
 parseExprs = do
     skipSpaces
-    e <- parseExpr
-    skipSpaces
-    es <- (parseExprs <|> pure [])
-    return (e:es)
+    es <- parseMany (skipSpaces *> parseExpr <* skipSpaces)
+    return es
