@@ -35,7 +35,7 @@ processLisp content =
             case compile ast of
                 Left err -> putStrLn $ "Compilation error: " ++ err
                 Right bytecode -> do
-                    case exec bytecode [] of
+                    case exec bytecode [] [] of
                         Left runtimeErr -> putStrLn $ "Runtime error: " ++ runtimeErr
                         Right value -> putStrLn $ show value
         Nothing -> putStrLn "Failed to parse the lisp expression."

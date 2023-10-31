@@ -7,7 +7,8 @@ import DataByteCode (Value(..), Op(..), Instruction(..), Insts)
 compile :: AST -> Either String Insts
 compile ast = 
     case ast of
-        Var x -> Left $ "Unsupported operation: variables should be resolved before this stage. Found: " ++ x
+        Var x -> compileVar x
+        Definition var value -> compileDefinition var value
         Const n -> Right [Push (Num (round n))]  -- conversion Float vers Int, attention à la perte de précision
         TruthValue b -> Right [Push (DataByteCode.Bool b)]
         If cond thenBranch elseBranch -> compileIf cond thenBranch elseBranch
@@ -42,4 +43,12 @@ compileBinaryOp op left right = do
     rightCode <- compile right
     return $ leftCode ++ rightCode ++ [Call op]
 
--- ... Vous devrez implémenter le reste des cas en suivant une logique similaire.
+-- Compile une définition AST 'Definition'
+compileDefinition :: String -> AST -> Either String Insts
+compileDefinition var valueAst = do
+    valueCode <- compile valueAst
+    return $ valueCode ++ [Store var]
+
+-- Compile une référence à une variable AST 'Var'
+compileVar :: String -> Either String Insts
+compileVar x = Right [Load x]
