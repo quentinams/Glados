@@ -44,11 +44,10 @@ main = do
             | otherwise -> putStrLn "Please provide a valid .bc file."
         _ -> putStrLn "Usage: ./glados [-i|--asm|-c] <filename>"
 
-processLisp :: String -> IO ()
 processLisp content =
+    let initialEnv = [] in
     case parseLispFile content of
         Right exprs -> do
-            let initialEnv = []  -- Environnement initial vide
             let (_, finalEnv, values) = foldl
                     (\(env, accEnv, accValues) expr ->
                         case compile (exprToAST expr) of
@@ -56,7 +55,7 @@ processLisp content =
                             Right instructions ->
                                 case exec instructions [] env of
                                     Left runtimeErr -> (env, accEnv ++ [env], accValues ++ [Left runtimeErr])
-                                    Right result -> (env, accEnv ++ [env], accValues ++ [Right result])
+                                    Right (result, newEnv) -> (newEnv, accEnv ++ [newEnv], accValues ++ [Right result])
                     )
                     (initialEnv, [], [])
                     exprs

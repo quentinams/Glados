@@ -16,8 +16,8 @@ execOp opN (Num x:Num y:stack) =
                 Div -> div
 execOp _ _ = Left "Error: Invalid stack for operation"
 
-exec :: Insts -> Stack -> SymbolTable -> Either String Value
-exec [] (v:_) _ = Right v
+exec :: Insts -> Stack -> SymbolTable -> Either String (Value, SymbolTable)
+exec [] (v:_) symTable = Right (v, symTable)
 exec [] [] _ = Left "Error: Empty stack and no instructions"
 exec (Push v:is) s symTable = exec is (v:s) symTable
 exec (Call op:is) s symTable = 
