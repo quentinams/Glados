@@ -1,7 +1,5 @@
 import Control.Exception
 import Datas
-import Env
-import Evaluation
 import ParserModule
 import ParseExpr
 import ASTConversion
