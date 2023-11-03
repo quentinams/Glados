@@ -95,7 +95,7 @@ processByteCodeFile content =
         Right instructions -> 
             case exec instructions [] [] of
                 Left runtimeErr -> putStrLn $ "Runtime error: " ++ runtimeErr
-                Right value -> putStrLn $ show value
+                Right value -> putStrLn $ show (fst value)
 
 parseInstructions :: String -> Either String [Instruction]
 parseInstructions content = 
@@ -121,7 +121,10 @@ parseInstruction str =
         ["Ret"]                 -> Just Ret
         ["JumpIfFalse", offset] -> Just $ JumpIfFalse (read offset)
         ["Jump", offset]        -> Just $ Jump (read offset)
+        ["Store", var]          -> Just $ Store var
+        ["Load", var]           -> Just $ Load var
         _                       -> Nothing
+
 
 
 parseOp :: String -> Maybe Op
