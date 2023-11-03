@@ -134,6 +134,6 @@ parseOp op =
         "Sub"  -> Just DataByteCode.Sub
         "Mul"  -> Just Mul
         "Div"  -> Just Div
-        "Eq"   -> Just Eq
+        "Eq"   -> Just DataByteCode.Eq
         "Less" -> Just Less
         _      -> Nothing

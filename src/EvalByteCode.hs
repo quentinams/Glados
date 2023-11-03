@@ -41,4 +41,4 @@ exec (Load var:is) s symTable =
         Nothing -> Left $ "Error: Undefined variable " ++ var
 exec (Store var:is) (value:s) symTable = exec is (value:s) ((var, value):symTable)
 exec (Store _:is) [] _ = Left "Error: Stack is empty, nothing to store"
-exec _ _ _ = Left "Error: Invalid instruction"
+exec inst@(instruction:_) _ _ = Left $ "Error: Invalid instruction - " ++ show instruction

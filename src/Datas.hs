@@ -29,4 +29,5 @@ data AST = Var String
         | Add AST AST
         | Sub AST AST
         | While AST AST
+        | Eq AST AST
         deriving (Eq, Show)
