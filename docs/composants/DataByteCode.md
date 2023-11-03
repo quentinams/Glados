@@ -43,7 +43,7 @@ data Instruction = Push Value
                  | Load String
                  deriving (Show, Eq)
 ```
-Types Associés
+### Types Associés
 
 Stack: Une pile pour les Value.
 
@@ -64,13 +64,11 @@ Fonction : showInstructions
 Affiche une liste d'instructions.
 ```haskell
 showInstructions :: Insts -> String
-```
-
-Description: Convertit une liste d'instructions en une chaîne de caractères.
-
-```haskell
 showInstructions insts = unlines (map show insts)
 ```
+
+### Description
+Convertit une liste d'instructions en une chaîne de caractères.
 
 ::: tip Note
 Cette documentation donne un aperçu général des types et fonctions définis dans le module DataByteCode. Pour une compréhension plus détaillée, il est recommandé de consulter directement le code source.

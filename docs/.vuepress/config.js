@@ -5,8 +5,8 @@ module.exports = {
         nav: [
             { text: 'Accueil', link: '/' },
             { text: 'Introduction', link: '/introduction/' },
-            { text: 'Utilisation', link: '/utilisation/installation' },
-            { text: 'Composants', link: '/composants/Main' },
+            { text: 'Utilisation', link: '/utilisation/configuration' },
+            { text: 'Composants', link: '/composants/' },
             { text: 'Tests', link: '/tests/introduction' }
         ],
         sidebar: {
@@ -14,14 +14,22 @@ module.exports = {
                 ''
             ],
             '/utilisation/': [
-                'installation',
                 'configuration'
             ],
             '/composants/': [
                 'Main',
                 'ASTConversion',
                 'DataByteCode',
-                // ... autres fichiers de src
+                'Datas',
+                'EvalByteCode',
+                'ParseAnd',
+                'ParseChar',
+                'ParseExpr',
+                'ParseOr',
+                'ParserModule',
+                'ParseUtils',
+                'Types',
+                'WriteByteCode',
             ],
             '/tests/': [
                 'introduction',

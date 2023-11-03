@@ -1,3 +1,6 @@
+---
+sidebar: auto
+---
 # ASTConversion.hs
 
 ## Module : `ASTConversion`
@@ -32,7 +35,7 @@ exprToAST (Lambda params body) = LambdaFunc params (exprToAST body)
 exprToAST (Func params body) = UserFunc params (exprToAST body)
 ```
 
-Description
+### Description
 
 Convertit une expression Lisp Expr en un Abstract Syntax Tree (AST).
 

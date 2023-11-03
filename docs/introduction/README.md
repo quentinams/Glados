@@ -20,15 +20,6 @@ Ce projet vise à concevoir et développer un nouveau langage de programmation e
 ├── app
 │   └── Main.hs
 ├── docs
-│   ├── README.md
-│   ├── composants
-│   ├── introduction
-│   │   └── README.md
-│   ├── node_modules
-│   ├── package-lock.json
-│   ├── package.json
-│   ├── tests
-│   └── utilisation
 ├── glados.cabal
 ├── package.yaml
 ├── src
@@ -40,12 +31,10 @@ Ce projet vise à concevoir et développer un nouveau langage de programmation e
 
 ## Comment commencer
 
-- **Installation** : Consultez le guide [utilisation/installation.md](./utilisation/installation.md) pour les instructions d'installation.
+- **Installation** : Consultez le guide [Utilisation](../utilisation/configuration.md) pour les instructions d'installation.
   
-- **Configuration** : Une fois installé, vous pouvez configurer l'environnement selon vos besoins en suivant [utilisation/configuration.md](./utilisation/configuration.md).
+- **Tests** : Des tests préliminaires sont disponibles dans le dossier [Tests](../tests) pour évaluer les fonctionnalités de base du langage.
 
-- **Tests** : Des tests préliminaires sont disponibles dans le dossier [tests](./tests) pour évaluer les fonctionnalités de base du langage.
-
-- **Composants** : Pour une compréhension approfondie des composants clés du projet, reportez-vous au dossier [composants](./composants).
+- **Composants** : Pour une compréhension approfondie des composants clés du projet, reportez-vous au dossier [Composants](../composants/README.md).
 
 Nous espérons que ce projet fournira un aperçu passionnant de la conception des langages de programmation et encouragera une exploration plus approfondie dans ce domaine. Bon codage !

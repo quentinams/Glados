@@ -25,9 +25,7 @@ Bienvenue dans la documentation notre Glados ! Ici, vous trouverez des informati
   - [Types](./composants/Types.md)
   - [WriteByteCode](./composants/WriteByteCode.md)
 
-- [Utilisation](./utilisation)
-  - [Installation](./utilisation/installation.md)
-  - [Configuration](./utilisation/configuration.md)
+- [Utilisation](./utilisation/configuration.md)
 
 - [Tests](./tests)
   - [Introduction aux Tests](./tests/introduction.md)
