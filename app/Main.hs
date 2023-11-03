@@ -44,6 +44,7 @@ main = do
             | otherwise -> putStrLn "Please provide a valid .bc file."
         _ -> putStrLn "Usage: ./glados [-i|--asm|-c] <filename>"
 
+processLisp :: String -> IO ()
 processLisp content =
     let initialEnv = [] in
     case parseLispFile content of
@@ -59,7 +60,6 @@ processLisp content =
                     )
                     (initialEnv, [], [])
                     exprs
-            -- Afficher les résultats ou les erreurs
             case values of
                 [] -> putStrLn "No expressions found."
                 _ -> do
@@ -71,15 +71,15 @@ processLisp content =
 
 processLispHumanReadable :: String -> IO ()
 processLispHumanReadable content = 
-    case runParser parseExpr content of
-        Just (expr, _) -> do
-            let ast = exprToAST expr
-            case compile ast of
-                Left err -> putStrLn $ "Compilation error: " ++ err
-                Right bytecode -> do
-                    putStr $ showInstructions bytecode
-        Nothing -> putStrLn "Failed to parse the lisp expression."
-
+    case parseLispFile content of
+        Right exprs -> do
+            forM_ exprs $ \expr -> do
+                let ast = exprToAST expr
+                case compile ast of
+                    Left err -> putStrLn $ "Compilation error: " ++ err
+                    Right bytecode -> do
+                        putStr $ showInstructions bytecode
+        Left err -> putStrLn err
 
 changeExtensionToBC :: String -> String
 changeExtensionToBC filename = base ++ ".bc"
