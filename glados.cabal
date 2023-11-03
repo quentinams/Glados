@@ -39,7 +39,6 @@ library
       DataByteCode
       Datas
       EvalByteCode
-      MathFunctions
       ParseAnd
       ParseChar
       ParseExpr
