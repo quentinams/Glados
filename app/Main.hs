@@ -137,6 +137,3 @@ parseOp op =
         "Eq"   -> Just Eq
         "Less" -> Just Less
         _      -> Nothing
-
-
-char str[10];
