@@ -67,6 +67,21 @@ parseList = do
     _ <- parseChar ')'
     return $ List exprs
 
+parseLoop :: Parser Expr
+parseLoop = do
+    skipSpaces
+    _ <- parseString "("
+    _ <- skipSpaces
+    _ <- parseString "loop"
+    _ <- skipSpaces
+    condition <- parseExpr
+    skipSpaces
+    body <- parseExpr
+    _ <- skipSpaces
+    _ <- parseString ")"
+    return $ Loop condition body
+
+
 -- Un parseur qui reconnaît n'importe quel type d'Expr
 parseExpr :: Parser Expr
 parseExpr = parseNumber
@@ -76,6 +91,7 @@ parseExpr = parseNumber
         <|> parseBool
         <|> parseList
         <|> parseLambda
+        <|> parseLoop
 
 -- parseExprs :: Parser [Expr]
 -- parseExprs = do

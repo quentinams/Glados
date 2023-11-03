@@ -6,6 +6,7 @@ data Expr = Symbol String
           | List [Expr] 
           | Lambda [String] Expr 
           | Func [String] Expr
+          | Loop Expr Expr
           deriving (Eq)
 
 instance Show Expr where
@@ -26,4 +27,5 @@ data AST = Var String
         | Application AST [AST]
         | Definition String AST
         | Add AST AST
+        | While AST AST
         deriving (Eq, Show)
