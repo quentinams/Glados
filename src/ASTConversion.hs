@@ -11,6 +11,8 @@ exprToAST (List (Symbol "if" : condition : consequent : [alternative])) =
     If (exprToAST condition) (exprToAST consequent) (exprToAST alternative)
 exprToAST (List (Symbol "+" : left : [right])) = 
     Add (exprToAST left) (exprToAST right)
+exprToAST (List (Symbol "-" : left : [right])) = 
+    Sub (exprToAST left) (exprToAST right)
 exprToAST (List(Symbol "define" : Symbol name : [value])) = 
     Definition name (exprToAST value)
 exprToAST (List xs) = Application (exprToAST $ head xs) (map exprToAST $ tail xs)

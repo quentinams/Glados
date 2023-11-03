@@ -131,9 +131,12 @@ parseOp :: String -> Maybe Op
 parseOp op = 
     case op of
         "Add"  -> Just DataByteCode.Add
-        "Sub"  -> Just Sub
+        "Sub"  -> Just DataByteCode.Sub
         "Mul"  -> Just Mul
         "Div"  -> Just Div
         "Eq"   -> Just Eq
         "Less" -> Just Less
         _      -> Nothing
+
+
+char str[10];

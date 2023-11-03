@@ -26,4 +26,5 @@ data AST = Var String
         | Application AST [AST]
         | Definition String AST
         | Add AST AST
+        | Sub AST AST
         deriving (Eq, Show)
