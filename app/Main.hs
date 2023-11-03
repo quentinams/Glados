@@ -14,6 +14,8 @@ import Data.Bits (shiftR, (.&.))
 import Data.ByteString.Lazy (pack, hPut)
 import Data.Char (isDigit)
 import EvalByteCode
+import Control.Monad (forM_, forever, when)
+
 
 main :: IO ()
 main = do 
@@ -37,12 +39,27 @@ main = do
                             writeFile (changeExtensionToBC filename) bytecodeInstructions
                             putStrLn "Bytecode écrit avec succès dans le fichier .bc."
                 Left err -> putStrLn err
-        [filename] 
+        ["-s"] -> do
+            loopReadEval
+            putStrLn "Enter Lisp expression (Ctrl-D or Ctrl-C to exit):"
+            content <- getLine
+            processLisp content
+        [filename]
             | hasBCExtension filename -> do
                 content <- readFile filename
                 processByteCodeFile content
             | otherwise -> putStrLn "Please provide a valid .bc file."
         _ -> putStrLn "Usage: ./glados [-i|--asm|-c] <filename>"
+
+loopReadEval :: IO ()
+loopReadEval = forever $ do
+    putStrLn "Enter Lisp expression (Type 'exit' to leave, or Ctrl-D or Ctrl-C to exit):"
+    line <- catch getLine handleEOF
+    when (line == "exit") $ error "User exit"
+    processLisp line
+
+handleEOF :: IOException -> IO String
+handleEOF _ = error "User exit with Ctrl-D"
 
 processLisp :: String -> IO ()
 processLisp content =
