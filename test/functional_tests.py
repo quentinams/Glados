@@ -55,8 +55,9 @@ def run_test(code: dict) -> List[str]:
     return ["KO", line]
 
 
-def print_result(result: list):
+def print_result(index: int, result: list):
     prefix = result[0]
+    print(f"#{index}\t->", end="")
     if prefix == "OK":
         print(Fore.GREEN, prefix, Fore.RESET)
     else:
@@ -70,5 +71,6 @@ if __name__ == "__main__":
         if code is None:
             break
         code = parse_test(code)
-        print_result(run_test(code))
+        code = run_test(code)
+        print_result(i, code)
         i += 1
