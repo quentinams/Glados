@@ -149,8 +149,8 @@ parseOp op =
     case op of
         "Add"  -> Just DataByteCode.Add
         "Sub"  -> Just DataByteCode.Sub
-        "Mul"  -> Just Mul
-        "Div"  -> Just Div
+        "Mul"  -> Just DataByteCode.Mul
+        "Div"  -> Just DataByteCode.Div
         "Eq"   -> Just DataByteCode.Eq
         "Less" -> Just Less
         _      -> Nothing

@@ -33,4 +33,6 @@ data AST = Var String
         | Eq AST AST
         | Assign String AST
         | Inf AST AST
+        | Div AST AST
+        | Mul AST AST
         deriving (Eq, Show)

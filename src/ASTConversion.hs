@@ -11,6 +11,10 @@ exprToAST (List (Symbol "if" : condition : consequent : [alternative])) =
     If (exprToAST condition) (exprToAST consequent) (exprToAST alternative)
 exprToAST (List (Symbol "+" : left : [right])) = 
     Add (exprToAST left) (exprToAST right)
+exprToAST (List (Symbol "/" : left : [right])) = 
+    Div (exprToAST left) (exprToAST right)
+exprToAST (List (Symbol "*" : left : [right])) = 
+    Mul (exprToAST left) (exprToAST right)
 exprToAST (List (Symbol "-" : left : [right])) = 
     Sub (exprToAST left) (exprToAST right)
 exprToAST (List (Symbol "eq?" : left : [right])) = 
