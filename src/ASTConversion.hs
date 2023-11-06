@@ -19,6 +19,8 @@ exprToAST (List(Symbol "=" : Symbol name : [value])) =
     Assign name (exprToAST value)
 exprToAST (List(Symbol "define" : Symbol name : [value])) = 
     Definition name (exprToAST value)
+exprToAST (List(Symbol "loop" : condition : [body])) =
+    While (exprToAST condition) (exprToAST body)
 exprToAST (List xs) = Application (exprToAST $ head xs) (map exprToAST $ tail xs)
 exprToAST (Lambda params body) = LambdaFunc params (exprToAST body)
 exprToAST (Func params body) = UserFunc params (exprToAST body)

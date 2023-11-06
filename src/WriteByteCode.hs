@@ -15,6 +15,7 @@ compile ast =
         Datas.Add left right -> compileBinaryOp DataByteCode.Add left right
         Datas.Sub left right -> compileBinaryOp DataByteCode.Sub left right
         Datas.Eq left right -> compileBinaryOp DataByteCode.Eq left right
+        While cond body -> compileWhile cond body
         Datas.Assign var value -> compileDefinition var value
         Sequence exprs -> compileSequence exprs
         -- Les autres cas nécessitent une gestion plus complexe des environnements, etc.
@@ -55,3 +56,13 @@ compileDefinition var valueAst = do
 -- Compile une référence à une variable AST 'Var'
 compileVar :: String -> Either String Insts
 compileVar x = Right [Load x]
+
+-- Compile un AST 'While'
+compileWhile :: AST -> AST -> Either String Insts
+compileWhile cond body = do
+    condCode <- compile cond
+    bodyCode <- compile body
+    let jumpOverBody = [JumpIfFalse (length bodyCode + 1)]
+    let jumpBackToStart = [Jump (negate (length condCode + length bodyCode + 1))]
+    return $ condCode ++ jumpOverBody ++ bodyCode ++ jumpBackToStart
+
