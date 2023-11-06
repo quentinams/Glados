@@ -5,12 +5,15 @@ Bienvenue dans la documentation notre Glados ! Ici, vous trouverez des informati
 ## Table des Matières
 
 - [Introduction](./introduction/README.md)
+
   - Qu'est-ce que ce projet ?
   - Vue d'ensemble
   - Structure du Répertoire
   - Comment commencer
-  
+  - Comment utiliser notre langague
+
 - [Composants](./composants/README.md)
+
   - [ASTConversion](./composants/ASTConversion.md)
   - [DataByteCode](./composants/DataByteCode.md)
   - [Datas](./composants/Datas.md)
@@ -38,4 +41,3 @@ Si vous avez des questions ou des préoccupations concernant ce projet, n'hésit
 ::: tip Note
 Cette documentation est en cours de développement. Si vous trouvez des erreurs ou des manques, n'hésitez pas à contribuer ou à faire des suggestions.
 :::
-
