@@ -25,7 +25,7 @@ compileIf cond thenBranch elseBranch = do
     condCode <- compile cond
     thenCode <- compile thenBranch
     elseCode <- compile elseBranch
-    let jumpOverThen = [JumpIfFalse (length thenCode + 2)]  -- +2 pour sauter l'instruction 'Jump' et tout le bloc 'else'
+    let jumpOverThen = [JumpIfFalse (length thenCode + 1)]  -- +2 pour sauter l'instruction 'Jump' et tout le bloc 'else'
     let jumpToEnd = [Jump (length elseCode)]  -- saut inconditionnel à la fin du 'then'
     return $ condCode ++ jumpOverThen ++ thenCode ++ jumpToEnd ++ elseCode
 
