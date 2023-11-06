@@ -15,6 +15,7 @@ compile ast =
         Datas.Add left right -> compileBinaryOp DataByteCode.Add left right
         Datas.Sub left right -> compileBinaryOp DataByteCode.Sub left right
         Datas.Eq left right -> compileBinaryOp DataByteCode.Eq left right
+        Datas.Inf left right -> compileBinaryOp Less left right
         While cond body -> compileWhile cond body
         Datas.Assign var value -> compileDefinition var value
         Sequence exprs -> compileSequence exprs

@@ -17,6 +17,8 @@ exprToAST (List (Symbol "eq?" : left : [right])) =
     Eq (exprToAST left) (exprToAST right)
 exprToAST (List(Symbol "=" : Symbol name : [value])) = 
     Assign name (exprToAST value)
+exprToAST (List (Symbol "<" : left : [right])) = 
+    Inf (exprToAST left) (exprToAST right)
 exprToAST (List(Symbol "define" : Symbol name : [value])) = 
     Definition name (exprToAST value)
 exprToAST (List(Symbol "loop" : condition : [body])) =

@@ -18,7 +18,7 @@ parseBool :: Parser Expr
 parseBool = skipSpaces *> ((Bool True <$ (parseChar '#' *> parseChar 't')) <|> (Bool False <$ (parseChar '#' *> parseChar 'f')))
 
 parseSymbol :: Parser Expr
-parseSymbol = Symbol <$> (skipSpaces *> parseSome (parseAnyChar (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9' ] ++ "-_+*/=")))
+parseSymbol = Symbol <$> (skipSpaces *> parseSome (parseAnyChar (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9' ] ++ "-_+*/=<")))
 
 parseNumber :: Parser Expr
 parseNumber = do

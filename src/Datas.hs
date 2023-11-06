@@ -32,4 +32,5 @@ data AST = Var String
         | While AST AST
         | Eq AST AST
         | Assign String AST
+        | Inf AST AST
         deriving (Eq, Show)
