@@ -81,12 +81,28 @@ parseLoop = do
     _ <- parseString ")"
     return $ Loop condition body
 
+parseNamedFunctionDefinition :: Parser Expr
+parseNamedFunctionDefinition = do
+    skipSpaces
+    _ <- parseString "("
+    _ <- skipSpaces
+    _ <- parseString "define"
+    _ <- skipSpaces
+    _ <- parseChar '('
+    name <- parseVariable
+    args <- parseMany (skipSpaces *> parseVariable <* skipSpaces)
+    _ <- parseChar ')'
+    _ <- skipSpaces
+    body <- parseExpr
+    _ <- skipSpaces
+    _ <- parseString ")"
+    return $ Define name args body
 
 -- Un parseur qui reconnaît n'importe quel type d'Expr
 parseExpr :: Parser Expr
 parseExpr = parseNumber
         <|> parseEq
-        -- <|> parseNamedFunctionDefinition
+        <|> parseNamedFunctionDefinition
         <|> parseSymbol
         <|> parseBool
         <|> parseList
