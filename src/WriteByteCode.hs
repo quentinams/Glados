@@ -15,6 +15,7 @@ compile ast =
         Datas.Add left right -> compileBinaryOp DataByteCode.Add left right
         Datas.Sub left right -> compileBinaryOp DataByteCode.Sub left right
         Datas.Eq left right -> compileBinaryOp DataByteCode.Eq left right
+        Datas.Assign var value -> compileDefinition var value
         Sequence exprs -> compileSequence exprs
         -- Les autres cas nécessitent une gestion plus complexe des environnements, etc.
         _ -> Left $ "Unsupported operation during compilation: " ++ show ast
